@@ -52,6 +52,9 @@ Makefile
 install_manifest.txt
 compile_commands.json
 
+# CMake
+CMakeUserPresets.json
+
 # Temporary files
 *.tmp
 *.log
@@ -67,3 +70,15 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# clangd
+.cache/
+
+# Logs
+*.log
