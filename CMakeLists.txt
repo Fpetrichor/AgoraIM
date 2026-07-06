@@ -22,7 +22,10 @@ add_library(agora_base
     src/base/log_level.cpp
     src/base/log_message.cpp
     src/base/logger.cpp
+)
 
+add_library(agora_net
+    src/net/inet_address.cpp
 )
 
 add_executable(agora_server
@@ -32,4 +35,5 @@ add_executable(agora_server
 target_link_libraries(agora_server
     PRIVATE
     agora_base
+    agora_net
 )

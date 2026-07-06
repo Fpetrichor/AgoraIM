@@ -3,6 +3,7 @@
 #include "agora/base/timestamp.h"
 
 namespace agora {
+    
 void LogMessage::format(std::ostringstream& oss) const {
     oss << timestamp_.toFormattedString() << " "
         << "[" << logLevelToString(level_) << "] "
