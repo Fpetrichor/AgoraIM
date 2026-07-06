@@ -19,6 +19,10 @@ add_library(agora_base
     src/base/noncopyable.cpp
     src/base/timestamp.cpp
     src/base/current_thread.cpp
+    src/base/log_level.cpp
+    src/base/log_message.cpp
+    src/base/logger.cpp
+
 )
 
 add_executable(agora_server

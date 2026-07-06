@@ -15,6 +15,8 @@ public:
 
     std::string toString() const;
 
+    std::string toFormattedString(bool showMicroseconds = false) const;
+
     int64_t microSecondsSinceEpoch() const;
 
 private:
