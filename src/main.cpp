@@ -1,6 +1,11 @@
 #include <iostream>
 
+#include "agora/base/timestamp.h"
+
 int main() {
-    std::cout << "AgoraIM Server Started!" << std::endl;
+    auto ts = agora::Timestamp::now();
+
+    std::cout << ts.toString() << std::endl;
+
     return 0;
 }
