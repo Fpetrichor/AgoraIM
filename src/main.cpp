@@ -1,11 +1,7 @@
 #include <iostream>
-
-#include "agora/base/timestamp.h"
+#include "agora/base/current_thread.h"
 
 int main() {
-    auto ts = agora::Timestamp::now();
-
-    std::cout << ts.toString() << std::endl;
-
+    std::cout << agora::CurrentThread::tid() << '\n';
     return 0;
 }

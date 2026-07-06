@@ -18,6 +18,7 @@ include_directories(include)
 add_library(agora_base
     src/base/noncopyable.cpp
     src/base/timestamp.cpp
+    src/base/current_thread.cpp
 )
 
 add_executable(agora_server
