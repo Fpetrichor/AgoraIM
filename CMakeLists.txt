@@ -13,7 +13,17 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_executable(
-    agora_server
+include_directories(include)
+
+add_library(agora_base
+    src/base/noncopyable.cpp
+)
+
+add_executable(agora_server
     src/main.cpp
+)
+
+target_link_libraries(agora_server
+    PRIVATE
+    agora_base
 )
