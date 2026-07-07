@@ -28,6 +28,7 @@ add_library(agora_net
     src/net/inet_address.cpp
     src/net/socket.cpp
     src/net/sockets_ops.cpp
+    src/net/channel.cpp
 )
 
 target_link_libraries(agora_net PUBLIC agora_base)

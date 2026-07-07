@@ -1,35 +1,63 @@
-#include "agora/net/socket.h"
-#include "agora/net/inet_address.h"
+#include "agora/net/channel.h"
+#include "agora/base/logger.h"
 #include <iostream>
-#include <sys/socket.h>
+
+// 模拟 EventLoop（暂时用 nullptr）
+class FakeLoop {};
 
 int main() {
-    // 创建 fd
-    int fd = ::socket(AF_INET, SOCK_STREAM, 0);
-    std::cout << "Created fd: " << fd << std::endl;
+    LOG_INFO("=== Channel 测试 ===");
 
-    {
-        // RAII 封装
-        agora::net::Socket socket(fd);
-        std::cout << "Socket fd: " << socket.fd() << std::endl;
+    // 创建一个 Channel，绑定 stdout fd (1)
+    agora::net::Channel channel(nullptr, 1);
 
-        // 设置选项
-        socket.setReuseAddr(true);
-        socket.setReusePort(true);
-        socket.setKeepAlive(true);
+    // 设置回调
+    channel.setReadCallback([]() {
+        std::cout << "read callback triggered\n";
+    });
 
-        // 绑定地址
-        agora::net::InetAddress addr(8080);
-        socket.bindAddress(addr);
+    channel.setWriteCallback([]() {
+        std::cout << "write callback triggered\n";
+    });
 
-        // 监听
-        socket.listen();
-        std::cout << "Listening on port 8080" << std::endl;
+    channel.setErrorCallback([]() {
+        std::cout << "error callback triggered\n";
+    });
 
-        // 这里不 accept，直接退出作用域测试析构
-    }
+    channel.setCloseCallback([]() {
+        std::cout << "close callback triggered\n";
+    });
 
-    std::cout << "Socket destroyed, fd closed automatically" << std::endl;
+    // 测试 enableReading
+    channel.enableReading();
+    std::cout << "events after enableReading: " << channel.events() << " (EPOLLIN=" << EPOLLIN << ")\n";
+
+    // 测试 enableWriting
+    channel.enableWriting();
+    std::cout << "events after enableWriting: " << channel.events() << "\n";
+
+    // 模拟 epoll 返回 EPOLLIN
+    channel.setRevents(EPOLLIN);
+    std::cout << "\n模拟 EPOLLIN:\n";
+    channel.handleEvent();
+
+    // 模拟 epoll 返回 EPOLLOUT
+    channel.setRevents(EPOLLOUT);
+    std::cout << "\n模拟 EPOLLOUT:\n";
+    channel.handleEvent();
+
+    // 模拟 epoll 返回 EPOLLIN | EPOLLERR
+    channel.setRevents(EPOLLIN | EPOLLERR);
+    std::cout << "\n模拟 EPOLLIN | EPOLLERR:\n";
+    channel.handleEvent();
+
+    // 测试 disableWriting
+    channel.disableWriting();
+    std::cout << "\nevents after disableWriting: " << channel.events() << "\n";
+
+    // 测试 disableAll
+    channel.disableAll();
+    std::cout << "events after disableAll: " << channel.events() << "\n";
 
     return 0;
 }
