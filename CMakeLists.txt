@@ -26,7 +26,11 @@ add_library(agora_base
 
 add_library(agora_net
     src/net/inet_address.cpp
+    src/net/socket.cpp
+    src/net/sockets_ops.cpp
 )
+
+target_link_libraries(agora_net PUBLIC agora_base)
 
 add_executable(agora_server
     src/main.cpp
@@ -34,6 +38,6 @@ add_executable(agora_server
 
 target_link_libraries(agora_server
     PRIVATE
-    agora_base
     agora_net
+    agora_base
 )
