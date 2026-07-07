@@ -29,6 +29,7 @@ add_library(agora_net
     src/net/socket.cpp
     src/net/sockets_ops.cpp
     src/net/channel.cpp
+    src/net/poller.cpp
 )
 
 target_link_libraries(agora_net PUBLIC agora_base)
