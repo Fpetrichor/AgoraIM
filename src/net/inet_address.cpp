@@ -18,7 +18,7 @@ InetAddress::InetAddress(uint16_t port, bool loopbackOnly, bool ipv6) {
 }
 
 InetAddress::InetAddress(const std::string& ip, uint16_t port, bool ipv6) {
-    memset(&addr_, 0, sizeof(addr_));
+    addr_ = {};
 
     addr_.sin_family = AF_INET;
     addr_.sin_port = htons(port);

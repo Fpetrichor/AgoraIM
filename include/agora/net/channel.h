@@ -15,6 +15,13 @@ class EventLoop;
 
 class Channel : public NonCopyable {
 public:
+    enum State {
+        kNew = -1,
+        kAdded = 1,
+        kDeleted = 2
+    };
+
+public:
     using EventCallback = std::function<void()>;
     using Event = uint32_t;
     
@@ -52,7 +59,7 @@ private:
     const int fd_;
     Event events_;
     Event revents_;
-    int index_ = -1; // used by Poller
+    int index_; // used by Poller
 
     EventCallback readCallback_;
     EventCallback writeCallback_;

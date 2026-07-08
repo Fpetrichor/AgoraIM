@@ -3,7 +3,7 @@
 namespace agora::net {
 
 Channel::Channel(EventLoop* loop, int fd) 
-    : loop_(loop), fd_(fd), events_(kNoneEvent), revents_(0) {}
+    : loop_(loop), fd_(fd), events_(kNoneEvent), revents_(0), index_(kNew) {}
 
 Channel::~Channel() = default;
 
