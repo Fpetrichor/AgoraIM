@@ -33,6 +33,7 @@ add_library(agora_net
     src/net/epoll_poller.cpp
     src/net/event_loop.cpp
     src/net/acceptor.cpp
+    src/net/buffer.cpp
 )
 
 target_link_libraries(agora_net PUBLIC agora_base)
