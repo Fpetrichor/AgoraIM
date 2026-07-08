@@ -7,6 +7,9 @@
 namespace agora::net {
 class InetAddress {
 public:
+
+    InetAddress() = default; 
+
     explicit InetAddress(uint16_t port, bool loopbackOnly = false, bool ipv6 = false);
 
     InetAddress(const std::string& ip, uint16_t port, bool ipv6 = false);
@@ -27,7 +30,7 @@ public:
     void setSockAddr(const sockaddr_in& addr) { addr_ = addr; }
 
 private:
-    struct sockaddr_in addr_;
+    struct sockaddr_in addr_{};
 };
 
 } // namespace agora::net

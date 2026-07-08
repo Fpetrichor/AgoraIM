@@ -1,4 +1,5 @@
 #include "agora/net/channel.h"
+#include "agora/net/event_loop.h"
 
 namespace agora::net {
 
@@ -49,7 +50,9 @@ void Channel::disableAll() {
 
 void Channel::update() {
     // TODO: Implement the logic to update the channel's events in the EventLoop.
-    // loop_->updateChannel(this);
+    if (loop_) {
+        loop_->updateChannel(this);
+    }
 }
 
 } // namespace agora::net
