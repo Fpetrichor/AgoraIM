@@ -23,6 +23,10 @@ void Channel::handleEvent() {
     }
 }
 
+void Channel::removeChannel() {
+    loop_->removeChannel(this);
+}
+
 void Channel::enableReading() {
     events_ |= kReadEvent;
     update();

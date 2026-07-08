@@ -34,6 +34,7 @@ add_library(agora_net
     src/net/event_loop.cpp
     src/net/acceptor.cpp
     src/net/buffer.cpp
+    src/net/tcp_connection.cpp
 )
 
 target_link_libraries(agora_net PUBLIC agora_base)

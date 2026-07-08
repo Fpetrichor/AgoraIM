@@ -30,6 +30,8 @@ public:
 
     void handleEvent();
 
+    void removeChannel();
+
     void setReadCallback(const EventCallback& cb) { readCallback_ = cb; }
     void setWriteCallback(const EventCallback& cb) { writeCallback_ = cb; }
     void setCloseCallback(const EventCallback& cb) { closeCallback_ = cb; }
