@@ -1,27 +1,36 @@
-#include "agora/net/buffer.h"
+#include "agora/net/tcp_server.h"
+#include "agora/net/event_loop.h"
+#include "agora/net/inet_address.h"
 #include "agora/base/logger.h"
 #include <iostream>
 
 int main() {
-    LOG_INFO("=== Buffer 修复测试 ===");
+    LOG_INFO("=== TcpServer 测试 ===");
 
-    agora::net::Buffer buf;
-
-    // 测试 writeFd 消费数据
-    buf.append("hello world");
-    std::cout << "before retrieve: " << buf.readableBytes() << std::endl;
+    agora::net::EventLoop loop;
+    agora::net::InetAddress listenAddr(8888);
     
-    std::string str = buf.retrieveAsString(2);
-    std::cout << "retrieved: '" << str << "'" << std::endl;
-    std::cout << "after retrieve: " << buf.readableBytes() << std::endl;
-
-    buf.append(" world");
-    std::cout << "final: '" << buf.retrieveAllAsString() << "'" << std::endl;
-
-    // 测试大容量扩容
-    std::string big(100000, 'a');
-    buf.append(big);
-    std::cout << "big readable: " << buf.readableBytes() << std::endl;
+    agora::net::TcpServer server(&loop, listenAddr, "AgoraServer");
+    
+    server.setConnectionCallback([](const agora::net::TcpConnectionPtr& conn) {
+        if (conn->connected()) {
+            LOG_INFO("Connection UP: " + conn->name());
+        } else {
+            LOG_INFO("Connection DOWN: " + conn->name());
+        }
+    });
+    
+    server.setMessageCallback([](const agora::net::TcpConnectionPtr& conn,
+                                  agora::net::Buffer* buffer) {
+        std::string msg = buffer->retrieveAllAsString();
+        LOG_INFO("Received from " + conn->name() + ": " + msg);
+        conn->send(msg);  // echo
+    });
+    
+    server.start();
+    LOG_INFO("Server started on port 8888");
+    
+    loop.loop();
 
     return 0;
 }

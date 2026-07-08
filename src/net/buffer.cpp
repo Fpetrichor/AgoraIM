@@ -115,10 +115,8 @@ ssize_t Buffer::readFd(int fd, int* savedErrno) {
 ssize_t Buffer::writeFd(int fd, int* savedErrno) {
     ssize_t n = ::write(fd, peek(), readableBytes());
     
-    if(savedErrno){
-            *savedErrno = errno;
-    } else {
-        retrieve(n);
+    if (n < 0) {
+        if (savedErrno) *savedErrno = errno;
     }
     
     return n;

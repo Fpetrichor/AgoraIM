@@ -113,4 +113,13 @@ int getSocketError(int sockfd) {
     }
 }
 
+InetAddress getLocalAddr(int sockfd) {
+    struct sockaddr_in localaddr;
+    socklen_t addrlen = sizeof(localaddr);
+    if (::getsockname(sockfd, reinterpret_cast<struct sockaddr*>(&localaddr), &addrlen) < 0) {
+        LOG_ERROR("sockets::getLocalAddr failed");
+    }
+    return InetAddress(localaddr);
+}
+
 } // namespace agora::net::sockets

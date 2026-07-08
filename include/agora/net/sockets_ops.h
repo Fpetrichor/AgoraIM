@@ -44,4 +44,6 @@ void setKeepAlive(int sockfd, bool on);
 // get socket error, abort if any error.
 int getSocketError(int sockfd);
 
+InetAddress getLocalAddr(int sockfd);
+
 } // namespace agora::net::sockets

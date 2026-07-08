@@ -46,6 +46,8 @@ public:
     void setRevents(uint32_t revents) { revents_ = revents; }
     
     bool isNoneEvent() const { return events_ == 0; }
+    bool isReading() const { return events_ & EPOLLIN; }
+    bool isWriting() const { return events_ & EPOLLOUT; }
 
     void enableReading();
     void disableReading();
