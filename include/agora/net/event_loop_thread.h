@@ -5,6 +5,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <string>
+#include <functional>
 
 namespace agora::net {
 
@@ -12,13 +13,15 @@ class EventLoop;
 
 class EventLoopThread : public NonCopyable {
 public:
+    using ThreadInitCallback = std::function<void(EventLoop*)>;
+
     explicit EventLoopThread(const std::string& name = "");
     ~EventLoopThread();
 
-    EventLoop* startLoop();
+    EventLoop* startLoop(const ThreadInitCallback& cb = ThreadInitCallback());
 
 private:
-    void threadFunc();
+    void threadFunc(const ThreadInitCallback& cb);
 
     EventLoop* loop_;
     std::string name_;

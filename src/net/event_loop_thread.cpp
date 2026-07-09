@@ -22,13 +22,13 @@ EventLoopThread::~EventLoopThread() {
     }
 }
 
-EventLoop* EventLoopThread::startLoop() {
+EventLoop* EventLoopThread::startLoop(const ThreadInitCallback& cb) {
     assert(!started_);
     started_ = true;
     
     LOG_INFO("EventLoopThread [" + name_ + "] starting...");
 
-    thread_ = std::thread(&EventLoopThread::threadFunc, this);
+    thread_ = std::thread(&EventLoopThread::threadFunc, this, cb);
 
     EventLoop* loop = nullptr;
     {
@@ -42,10 +42,14 @@ EventLoop* EventLoopThread::startLoop() {
     return loop;
 }
 
-void EventLoopThread::threadFunc() {
+void EventLoopThread::threadFunc(const ThreadInitCallback& cb) {
     LOG_INFO("EventLoopThread [" + name_ + "] begin loop");
 
     EventLoop loop;
+    
+    if (cb) {
+        cb(&loop);
+    }
     
     {
         std::lock_guard<std::mutex> lock(mutex_);
