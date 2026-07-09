@@ -46,4 +46,6 @@ int getSocketError(int sockfd);
 
 InetAddress getLocalAddr(int sockfd);
 
+InetAddress getPeerAddr(int sockfd);
+
 } // namespace agora::net::sockets

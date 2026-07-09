@@ -122,4 +122,13 @@ InetAddress getLocalAddr(int sockfd) {
     return InetAddress(localaddr);
 }
 
+InetAddress getPeerAddr(int sockfd) {
+    struct sockaddr_in peeraddr;
+    socklen_t addrlen = static_cast<socklen_t>(sizeof peeraddr);
+    if (::getpeername(sockfd, reinterpret_cast<struct sockaddr*>(&peeraddr), &addrlen) < 0) {
+        LOG_ERROR("sockets::getPeerAddr failed");
+    }
+    return InetAddress(peeraddr);
+}
+
 } // namespace agora::net::sockets
