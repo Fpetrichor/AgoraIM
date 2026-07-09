@@ -4,6 +4,7 @@
 #include "agora/net/event_loop_thread_pool.h"
 #include "agora/net/sockets_ops.h"
 #include "agora/base/logger.h"
+#include <cassert>
 
 namespace agora::net {
 
