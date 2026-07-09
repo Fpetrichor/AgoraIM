@@ -53,3 +53,6 @@ target_link_libraries(agora_server
     agora_net
     agora_base
 )
+
+# 新增：编译 examples 目录
+add_subdirectory(examples)
