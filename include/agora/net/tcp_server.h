@@ -34,18 +34,19 @@ public:
         writeCompleteCallback_ = cb;
     }
 
-    void start();
     void setThreadNum(int numThreads);
+
     void setThreadInitCallback(const ThreadInitCallback& cb) {
         threadInitCallback_ = cb;
     }
+
+    void start();
 
     const std::string& name() const { return name_; }
     const std::string& ipPort() const { return ipPort_; }
 
 private:
     void newConnection(int sockfd, const InetAddress& peerAddr);
-
     void removeConnection(const TcpConnectionPtr& conn);
     void removeConnectionInLoop(const TcpConnectionPtr& conn);
 
@@ -62,7 +63,7 @@ private:
     TcpConnection::ConnectionCallback connectionCallback_;
     TcpConnection::MessageCallback messageCallback_;
     TcpConnection::WriteCompleteCallback writeCompleteCallback_;
-    ThreadInitCallback threadInitCallback_; 
+    ThreadInitCallback threadInitCallback_;
 
     bool started_;
     int nextConnId_;

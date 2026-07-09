@@ -1,8 +1,8 @@
 #include "agora/net/tcp_server.h"
 #include "agora/net/acceptor.h"
 #include "agora/net/event_loop.h"
-#include "agora/net/sockets_ops.h"
 #include "agora/net/event_loop_thread_pool.h"
+#include "agora/net/sockets_ops.h"
 #include "agora/base/logger.h"
 
 namespace agora::net {
@@ -30,17 +30,22 @@ TcpServer::~TcpServer() {
     
     for (auto& item : connections_) {
         TcpConnectionPtr conn(item.second);
-        item.second.reset(); 
+        item.second.reset();
         
-        conn->connectDestroyed();
+        EventLoop* ioLoop = conn->getLoop();
+        ioLoop->runInLoop(
+            std::bind(&TcpConnection::connectDestroyed, conn));
     }
 }
 
 void TcpServer::setThreadNum(int numThreads) {
+    assert(!started_);
     threadPool_->setThreadNum(numThreads);
 }
 
 void TcpServer::start() {
+    loop_->assertInLoopThread();
+
     if (!started_) {
         started_ = true;
         threadPool_->start(threadInitCallback_);
@@ -50,14 +55,15 @@ void TcpServer::start() {
 
 void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr) {
     loop_->assertInLoopThread();
-
+    
     EventLoop* ioLoop = threadPool_->getNextLoop();
     
     std::string connName = name_ + "#" + std::to_string(nextConnId_++);
     
     LOG_INFO("TcpServer::newConnection [" + name_ + 
              "] - new connection [" + connName + 
-             "] from " + peerAddr.toIpPort());
+             "] from " + peerAddr.toIpPort() +
+             " assigned to loop " + std::to_string(reinterpret_cast<uintptr_t>(ioLoop)));
     
     InetAddress localAddr(sockets::getLocalAddr(sockfd));
     
@@ -72,11 +78,13 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr) {
     
     connections_[connName] = conn;
     
-    conn->connectEstablished();
+    ioLoop->runInLoop(
+        std::bind(&TcpConnection::connectEstablished, conn));
 }
 
 void TcpServer::removeConnection(const TcpConnectionPtr& conn) {
-    removeConnectionInLoop(conn);
+    loop_->runInLoop(
+        std::bind(&TcpServer::removeConnectionInLoop, this, conn));
 }
 
 void TcpServer::removeConnectionInLoop(const TcpConnectionPtr& conn) {
@@ -87,7 +95,9 @@ void TcpServer::removeConnectionInLoop(const TcpConnectionPtr& conn) {
     
     connections_.erase(conn->name());
     
-    conn->connectDestroyed();
+    EventLoop* ioLoop = conn->getLoop();
+    ioLoop->queueInLoop(
+        std::bind(&TcpConnection::connectDestroyed, conn));
 }
 
 } // namespace agora::net
