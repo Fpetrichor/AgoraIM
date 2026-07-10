@@ -13,6 +13,15 @@ public:
 
     static Timestamp now();
 
+    static Timestamp invalid();
+
+    bool isValid() const;
+
+    static Timestamp addTime(Timestamp timestamp, double seconds);
+
+    bool operator<(const Timestamp& rhs) const;
+    bool operator==(const Timestamp& rhs) const;
+
     std::string toString() const;
 
     std::string toFormattedString(bool showMicroseconds = false) const;

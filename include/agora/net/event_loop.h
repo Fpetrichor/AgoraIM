@@ -1,6 +1,8 @@
 #pragma once
 
 #include "agora/base/noncopyable.h"
+#include "agora/net/timer_id.h"
+#include "agora/base/timestamp.h"
 #include <memory>
 #include <thread>
 #include <vector>
@@ -11,6 +13,7 @@ namespace agora::net {
 
 class Channel;
 class Poller;
+class TimerQueue; 
 
 class EventLoop : public NonCopyable {
 public:
@@ -33,6 +36,12 @@ public:
 
     void wakeup();
 
+    TimerId runAt(Timestamp time, TimerCallback cb);
+    TimerId runAfter(double delay, TimerCallback cb);
+    TimerId runEvery(double interval, TimerCallback cb);
+
+    void cancel(TimerId timerId);
+
 private:
     void handleRead();
     void doPendingFunctors();
@@ -53,6 +62,7 @@ private:
 
     int wakeupFd_;
     std::unique_ptr<Channel> wakeupChannel_;
+    std::unique_ptr<TimerQueue> timerQueue_;
 };
 
 } // namespace agora::net

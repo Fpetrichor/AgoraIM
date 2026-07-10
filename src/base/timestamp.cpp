@@ -22,6 +22,27 @@ Timestamp Timestamp::now() {
     return Timestamp(microSeconds);
 }
 
+Timestamp Timestamp::invalid() {
+    return Timestamp();
+}
+
+bool Timestamp::isValid() const {
+    return microSecondsSinceEpoch_ > 0;
+}
+
+Timestamp Timestamp::addTime(Timestamp timestamp, double seconds) {
+    int64_t delta = static_cast<int64_t>(seconds * 1000 * 1000);
+    return Timestamp(timestamp.microSecondsSinceEpoch() + delta);
+}
+
+bool Timestamp::operator<(const Timestamp& rhs) const {
+    return microSecondsSinceEpoch_ < rhs.microSecondsSinceEpoch_;
+}
+
+bool Timestamp::operator==(const Timestamp& rhs) const {
+    return microSecondsSinceEpoch_ == rhs.microSecondsSinceEpoch_;
+}
+
 std::string Timestamp::toString() const {
     return std::to_string(microSecondsSinceEpoch_);
 }

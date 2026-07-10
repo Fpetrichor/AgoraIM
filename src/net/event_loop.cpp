@@ -1,6 +1,7 @@
 #include "agora/net/event_loop.h"
 #include "agora/net/epoll_poller.h"
 #include "agora/net/channel.h"
+#include "agora/net/timer_queue.h"
 #include "agora/base/logger.h"
 #include "agora/base/current_thread.h"
 #include <cassert>
@@ -26,7 +27,8 @@ EventLoop::EventLoop()
       poller_(std::make_unique<EPollPoller>(this)),
       callingPendingFunctors_(false),
       wakeupFd_(createEventfd()),
-      wakeupChannel_(new Channel(this, wakeupFd_)) {
+      wakeupChannel_(new Channel(this, wakeupFd_)),
+      timerQueue_(new TimerQueue(this)) {
     
     wakeupChannel_->setReadCallback(
         std::bind(&EventLoop::handleRead, this));
@@ -120,6 +122,26 @@ void EventLoop::wakeup() {
     if (n != sizeof(one)) {
         LOG_ERROR("EventLoop::wakeup() writes " + std::to_string(n) + " bytes instead of 8");
     }
+}
+
+TimerId EventLoop::runAt(Timestamp time, TimerCallback cb) {
+    return timerQueue_->addTimer(std::move(cb), time, 0.0);
+}
+
+TimerId EventLoop::runAfter(double delay, TimerCallback cb) {
+    Timestamp time(Timestamp::addTime(Timestamp::now(), delay));
+    return timerQueue_->addTimer(std::move(cb), time, 0.0);
+}
+
+TimerId EventLoop::runEvery(double interval, TimerCallback cb) {
+    Timestamp time(Timestamp::addTime(Timestamp::now(), interval));
+    return timerQueue_->addTimer(std::move(cb), time, interval);
+}
+
+void EventLoop::cancel(
+        TimerId timerId)
+{
+    timerQueue_->cancel(timerId);
 }
 
 void EventLoop::handleRead() {
