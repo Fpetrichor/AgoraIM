@@ -45,6 +45,7 @@ add_library(agora_net
     src/net/timer_queue.cpp
     src/net/http/http_request.cpp
     src/net/http/http_response.cpp
+    src/net/http/http_context.cpp
 )
 
 target_link_libraries(agora_net PUBLIC agora_base)

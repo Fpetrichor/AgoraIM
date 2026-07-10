@@ -7,6 +7,7 @@
 #include <string.h>
 #include <cassert>
 #include <cstring>
+#include <algorithm>
 
 namespace agora::net {
 
@@ -120,6 +121,17 @@ ssize_t Buffer::writeFd(int fd, int* savedErrno) {
     }
     
     return n;
+}
+
+
+const char* Buffer::findCRLF() const {
+    // 使用 peek() + readableBytes() 替代 beginWrite()
+    const char* crlf = std::search(peek(), peek() + readableBytes(), kCRLF, kCRLF + 2);
+    return crlf == peek() + readableBytes() ? nullptr : crlf;
+}
+
+void Buffer::retrieveUntil(const char* end) {
+    retrieve(end - peek());
 }
 
 } // namespace agora::net

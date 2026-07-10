@@ -5,6 +5,8 @@
 #include <string>
 #include <cstdint>
 
+static const char kCRLF[] = "\r\n";
+
 namespace agora::net {
 
 /**
@@ -73,6 +75,9 @@ public:
      * @return 写入的字节数，出错返回 -1
      */
     ssize_t writeFd(int fd, int* savedErrno);
+
+    const char* findCRLF() const;
+    void retrieveUntil(const char* end);
 
 private:
     /** 返回 buffer_ 起始地址 */
