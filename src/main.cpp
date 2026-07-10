@@ -1,39 +1,40 @@
-#include "agora/net/event_loop.h"
+#include "agora/net/http/http_request.h"
 #include "agora/base/logger.h"
+#include <iostream>
 
-using namespace agora;
-using namespace agora::net;
+using namespace agora::net::http;
 
 int main() {
-    LOG_INFO("===== Timer Test Start =====");
+    LOG_INFO("=== HttpRequest Test ===");
 
-    EventLoop loop;
-
-    // 2 秒后执行一次
-    loop.runAfter(2.0, []() {
-        LOG_INFO("runAfter(): after 2 seconds");
-    });
-
-    // 每秒执行一次
-    TimerId timer = loop.runEvery(1.0, []() {
-        LOG_INFO("runEvery(): tick");
-    });
-
-    // 5 秒后取消循环定时器
-    loop.runAfter(5.0, [&]() {
-        LOG_INFO("Cancel repeating timer");
-        loop.cancel(timer);
-    });
-
-    // 7 秒退出 EventLoop
-    loop.runAfter(7.0, [&]() {
-        LOG_INFO("Quit EventLoop");
-        loop.quit();
-    });
-
-    loop.loop();
-
-    LOG_INFO("===== Timer Test End =====");
-
+    HttpRequest request;
+    
+    request.setMethod(HttpRequest::Method::kGet);
+    request.setVersion(HttpRequest::Version::kHttp11);
+    request.setPath("/index.html");
+    request.setQuery("id=1&name=test");
+    request.addHeader("Host", "localhost");
+    request.addHeader("User-Agent", "AgoraIM/0.1");
+    
+    // 验证
+    LOG_INFO("Method: " + std::to_string(static_cast<int>(request.method())));
+    LOG_INFO("Version: " + std::to_string(static_cast<int>(request.version())));
+    LOG_INFO("Path: " + request.path());
+    LOG_INFO("Query: " + request.query());
+    LOG_INFO("Host: " + request.getHeader("Host"));
+    LOG_INFO("User-Agent: " + request.getHeader("User-Agent"));
+    
+    // 测试 swap
+    HttpRequest other;
+    other.setMethod(HttpRequest::Method::kPost);
+    other.setPath("/api");
+    
+    request.swap(other);
+    
+    LOG_INFO("After swap, request.path: " + request.path());
+    LOG_INFO("After swap, other.path: " + other.path());
+    
+    LOG_INFO("Test passed!");
+    
     return 0;
 }
