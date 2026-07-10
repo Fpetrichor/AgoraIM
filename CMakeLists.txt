@@ -43,6 +43,8 @@ add_library(agora_net
     src/net/timer.cpp
     src/net/timer_id.cpp
     src/net/timer_queue.cpp
+    src/net/http/http_request.cpp
+    src/net/http/http_response.cpp
 )
 
 target_link_libraries(agora_net PUBLIC agora_base)
