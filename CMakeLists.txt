@@ -46,6 +46,7 @@ add_library(agora_net
     src/net/http/http_request.cpp
     src/net/http/http_response.cpp
     src/net/http/http_context.cpp
+    src/net/http/http_server.cpp
 )
 
 target_link_libraries(agora_net PUBLIC agora_base)

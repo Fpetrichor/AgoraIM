@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <functional>
+#include <any>
 
 namespace agora::net {
 
@@ -66,6 +67,9 @@ public:
         highWaterMark_ = highWaterMark;
     }
 
+    void setContext(const std::shared_ptr<void>& context) { context_ = context; }
+    std::shared_ptr<void> getContext() const { return context_; }
+
 private:
     void handleRead();
     void handleWrite();
@@ -97,6 +101,7 @@ private:
     HighWaterMarkCallback highWaterMarkCallback_;
 
     size_t highWaterMark_;
+    std::shared_ptr<void> context_;
 };
 
 using TcpConnectionPtr = std::shared_ptr<TcpConnection>;
