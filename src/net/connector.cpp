@@ -21,7 +21,8 @@ Connector::Connector(EventLoop* loop, const InetAddress& serverAddr)
     : loop_(loop),
       serverAddr_(serverAddr),
       connect_(false),
-      state_(State::kDisconnected) {}
+      state_(State::kDisconnected),
+      retryDelayMs_(kInitRetryDelayMs) {}
 
 Connector::~Connector() {
     assert(!channel_ || channel_->isNoneEvent());
@@ -40,6 +41,7 @@ void Connector::start() {
 void Connector::restart() {
     loop_->assertInLoopThread();
     setState(State::kDisconnected);
+    retryDelayMs_ = kInitRetryDelayMs;
     connect_ = true;
     startInLoop();
 }
@@ -50,6 +52,9 @@ void Connector::stop() {
 }
 
 void Connector::startInLoop() {
+    LOG_INFO("Connector::startInLoop - now=" + Timestamp::now().toFormattedString() +
+             ", state=" + std::to_string(static_cast<int>(state_)));
+
     loop_->assertInLoopThread();
     
     if (state_ != State::kDisconnected) {
@@ -95,6 +100,7 @@ void Connector::connect() {
     
     if (ret == 0) {
         LOG_INFO("Connector::connect - connect succeeded immediately");
+        retryDelayMs_ = kInitRetryDelayMs;
         connecting(sockfd);
     } else if (isInProgress(savedErrno)) {
         LOG_INFO("Connector::connect - connect in progress");
@@ -130,6 +136,7 @@ void Connector::handleWrite() {
         
         if (err == 0) {
             setState(State::kConnected);
+            retryDelayMs_ = kInitRetryDelayMs;
             if (connect_) {
                 // ④ 防御性检查
                 if (newConnectionCallback_) {
@@ -172,11 +179,17 @@ void Connector::retry() {
     setState(State::kDisconnected);
     
     if (connect_) {
-        LOG_INFO("Connector::retry - will retry connecting to " + 
-                 serverAddr_.toIpPort());
-        // ③ TODO: 用 TimerQueue 实现延迟重试，避免立即重试
-        // 目前直接重试
-        loop_->runInLoop(std::bind(&Connector::startInLoop, this));
+        LOG_INFO("Connector::retry - now=" + Timestamp::now().toFormattedString() +
+                 ", will retry in " + std::to_string(retryDelayMs_) + "ms");
+
+        loop_->runAfter(retryDelayMs_ / 1000.0,
+                        std::bind(&Connector::startInLoop, this));
+        
+        // 指数退避
+        retryDelayMs_ *= 2;
+        if (retryDelayMs_ > kMaxRetryDelayMs) {
+            retryDelayMs_ = kMaxRetryDelayMs;
+        }
     }
 }
 

@@ -34,10 +34,13 @@ public:
     const InetAddress& serverAddress() const { return serverAddr_; }
 
 private:
+    static constexpr int kInitRetryDelayMs = 500;
+    static constexpr int kMaxRetryDelayMs = 30000;
+    
     void setState(State s);
     
     void startInLoop();
-    void stopInLoop();           // 新增
+    void stopInLoop();
     void connect();
     void connecting(int sockfd);
     void handleWrite();
@@ -51,6 +54,7 @@ private:
     bool connect_;
     State state_;
     std::unique_ptr<Channel> channel_;
+    int retryDelayMs_;
 
     NewConnectionCallback newConnectionCallback_;
 };
